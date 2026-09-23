@@ -415,7 +415,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-gray-700 mb-2">Жас жубайларға тілегіңіз:</label>
+                        <label class="block text-xs font-semibold uppercase text-gray-700 mb-2">Жас жұбайларға тілегіңіз:</label>
                         <textarea id="wishes" rows="3" placeholder="Ақ тілегіңізді жазыңыз..." class="w-full px-4 py-3 rounded-xl border border-gold/30 focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none transition bg-cream/30 text-sm resize-none"></textarea>
                     </div>
 
@@ -431,7 +431,7 @@
             <p class="font-serif text-sm text-gold-dark mb-1">Той иелері: Серікбек & Бақытгүл</p>
             <p>Сіздерді асыға күтеміз!</p>
             <div class="mt-6 text-[10px] text-gray-400">
-                Сайт дайындалған: <span class="font-semibold text-gold-dark">Онлайн Шақырту Сервисі</span>
+                Сайт дайындалған: <span class="font-semibold text-gold-dark">Онлайн Шақырту Сервисі: 87763390610</span>
             </div>
         </footer>
 
@@ -458,43 +458,85 @@
             }, 800);
         }
 
-        // 2. ГҮЛ КҮЛТЕЛЕРІН ЖАСАУ
-        function createPetals() {
-            const container = document.getElementById('petalContainer');
-            for (let i = 0; i < 20; i++) {
-                const petal = document.createElement('div');
-                petal.classList.add('petal');
-                petal.style.left = Math.random() * 100 + 'vw';
-                petal.style.animationDuration = Math.random() * 3 + 4 + 's';
-                petal.style.width = Math.random() * 12 + 8 + 'px';
-                petal.style.height = petal.style.width;
-                container.appendChild(petal);
-            }
-        }
-        createPetals();
+        // 2. ГҮЛ КҮЛТЕЛЕРІН ЖАСАУ (МӨЛШЕРІ КӨБЕЙТІЛГЕН ЖӘНЕ ҮЗДІКСІЗ ТҮСЕТІН)
+function createPetals() {
+    const container = document.getElementById('petalContainer');
+    const petalCount = 70; // Гүл күлтелерінің санын 20-дан 70-ке дейін көбейттік
+
+    for (let i = 0; i < petalCount; i++) {
+        const petal = document.createElement('div');
+        petal.classList.add('petal');
+
+        // Кездейсоқ көлденең орналасуы
+        petal.style.left = Math.random() * 100 + 'vw';
+
+        // Түсу жылдамдығы (4-тен 9 секундқа дейін)
+        petal.style.animationDuration = (Math.random() * 5 + 4) + 's';
+
+        // Барлығы бір уақытта емес, біртіндеп түсуі үшін кездейсоқ кідіріс (delay)
+        petal.style.animationDelay = (Math.random() * 8) + 's';
+
+        // Өлшемдерін әртүрлі әрі табиғилау қылу (8px - 22px)
+        const size = Math.random() * 14 + 8;
+        petal.style.width = size + 'px';
+        petal.style.height = (size * 1.3) + 'px';
+
+        // Әртүрлі бұрышпен айналып түсуі мен мөлдірлігі
+        petal.style.opacity = Math.random() * 0.6 + 0.3;
+        petal.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+        container.appendChild(petal);
+    }
+}
+
+createPetals();
 
         // 3. АУДИО ОЙНАУ ЛОГИКАСЫ
-        const bgMusic = document.getElementById('bgMusic');
-        const musicToggle = document.getElementById('musicToggle');
-        const waveContainer = document.getElementById('waveContainer');
-        const musicIcon = document.getElementById('musicIcon');
-        let isPlaying = false;
+const bgMusic = document.getElementById('bgMusic');
+const musicToggle = document.getElementById('musicToggle');
+const waveContainer = document.getElementById('waveContainer');
+const musicIcon = document.getElementById('musicIcon');
+let isPlaying = false;
 
-        function toggleAudio(forcePlay = false) {
-            if (isPlaying && !forcePlay) {
-                bgMusic.pause();
-                waveContainer.classList.remove('playing');
-                musicIcon.className = "fa-solid fa-music text-lg";
-                isPlaying = false;
-            } else {
-                bgMusic.play().then(() => {
-                    waveContainer.classList.add('playing');
-                    musicIcon.className = "fa-solid fa-pause text-lg";
-                    isPlaying = true;
-                }).catch(() => {});
-            }
-        }
-        musicToggle.addEventListener('click', () => toggleAudio());
+function playAudio() {
+    bgMusic.play().then(() => {
+        waveContainer.classList.add('playing');
+        musicIcon.className = "fa-solid fa-pause text-lg";
+        isPlaying = true;
+    }).catch((err) => {
+        console.log("Автоойнату браузер саясатымен бұғатталды:", err);
+    });
+}
+
+function pauseAudio() {
+    bgMusic.pause();
+    waveContainer.classList.remove('playing');
+    musicIcon.className = "fa-solid fa-music text-lg";
+    isPlaying = false;
+}
+
+function toggleAudio() {
+    if (isPlaying) {
+        pauseAudio();
+    } else {
+        playAudio();
+    }
+}
+
+musicToggle.addEventListener('click', toggleAudio);
+
+// 1) Сайт толық жүктелгенде музыканы автоматты түрде қосу
+window.addEventListener('DOMContentLoaded', () => {
+    playAudio();
+});
+
+// 2) Браузер шектеу қойған жағдайда, пайдаланушы сайттың кез келген жерін алғаш рет басқанда музыка қосылады
+document.addEventListener('click', function startAudioOnInteraction() {
+    if (!isPlaying) {
+        playAudio();
+    }
+    document.removeEventListener('click', startAudioOnInteraction);
+}, { once: true });
 
         // 4. ТАЙМЕР
         const weddingDate = new Date('October 25, 2026 18:00:00').getTime();
@@ -519,7 +561,7 @@
 
         // 5. RSVP WHATSAPP-ҚА ЖІБЕРУ
         const rsvpForm = document.getElementById('rsvpForm');
-        const organizerPhone = "77001234567";
+        const organizerPhone = "77763390610";
 
         rsvpForm.addEventListener('submit', function(e) {
             e.preventDefault();
