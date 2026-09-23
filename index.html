@@ -163,24 +163,29 @@
         </button>
     </div>
 
-    <!-- МУЗЫКА БАТЫРМАСЫ -->
-    <div class="fixed bottom-6 right-6 z-40">
-        <button id="musicToggle" class="bg-white/90 backdrop-blur-md border-2 border-gold/60 shadow-2xl rounded-full p-3.5 flex items-center gap-3 text-gold-dark hover:scale-105 transition-all duration-300">
-            <div id="waveContainer" class="flex items-center gap-1 h-5 px-1">
-                <span class="wave-bar bar1 h-2"></span>
-                <span class="wave-bar bar2 h-3"></span>
-                <span class="wave-bar bar3 h-4"></span>
-                <span class="wave-bar bar4 h-2"></span>
-            </div>
-            <i id="musicIcon" class="fa-solid fa-music text-lg"></i>
-            <span id="musicText" class="text-xs font-semibold uppercase tracking-wider pr-2 hidden sm:inline">Әуен</span>
-        </button>
-    </div>
+   <!-- МУЗЫКА БАТЫРМАСЫ ЖӘНЕ КЕҢЕС (HTML) -->
+<div class="fixed bottom-6 right-6 z-40 flex items-center gap-3">
+    <!-- Музыка қосылмағанда көрінетін кішігірім нұсқаулық -->
+    <span id="musicHint" class="bg-white/95 backdrop-blur-md border border-gold/40 text-gold-dark text-[11px] font-medium px-3.5 py-2 rounded-full shadow-lg animate-pulse hidden sm:inline-block">
+        🎵 Әуенді қосу үшін экранды басыңыз
+    </span>
 
-    <!-- Аудио элемент -->
-    <audio id="bgMusic" loop preload="auto">
-        <source src="https://assets.mixkit.co/music/preview/mixkit-beautiful-dream-493.mp3" type="audio/mpeg">
-    </audio>
+    <button id="musicToggle" class="bg-white/90 backdrop-blur-md border-2 border-gold/60 shadow-2xl rounded-full p-3.5 flex items-center gap-3 text-gold-dark hover:scale-105 transition-all duration-300">
+        <div id="waveContainer" class="flex items-center gap-1 h-5 px-1">
+            <span class="wave-bar bar1 h-2"></span>
+            <span class="wave-bar bar2 h-3"></span>
+            <span class="wave-bar bar3 h-4"></span>
+            <span class="wave-bar bar4 h-2"></span>
+        </div>
+        <i id="musicIcon" class="fa-solid fa-music text-lg"></i>
+        <span id="musicText" class="text-xs font-semibold uppercase tracking-wider pr-2 hidden sm:inline">Әуен</span>
+    </button>
+</div>
+
+<!-- Аудио элемент -->
+<audio id="bgMusic" loop preload="auto">
+    <source src="https://assets.mixkit.co/music/preview/mixkit-beautiful-dream-493.mp3" type="audio/mpeg">
+</audio>
 
     <!-- НЕГІЗГІ ВЕБ-САЙТ -->
     <main id="mainSite" class="opacity-0 transition-opacity duration-1000">
@@ -491,53 +496,63 @@ function createPetals() {
 
 createPetals();
 
-        // 3. АУДИО ОЙНАУ ЛОГИКАСЫ
+        // 3. АУДИО ОЙНАУ ЛОГИКАСЫ (БРАУЗЕР ШЕКТЕУЛЕРІН ТҮЗЕТКЕН НҰСҚА)
 const bgMusic = document.getElementById('bgMusic');
 const musicToggle = document.getElementById('musicToggle');
 const waveContainer = document.getElementById('waveContainer');
 const musicIcon = document.getElementById('musicIcon');
+const musicHint = document.getElementById('musicHint');
+
 let isPlaying = false;
 
-function playAudio() {
-    bgMusic.play().then(() => {
+// Әуенді қосу
+async function playAudio() {
+    try {
+        await bgMusic.play();
+        isPlaying = true;
         waveContainer.classList.add('playing');
         musicIcon.className = "fa-solid fa-pause text-lg";
-        isPlaying = true;
-    }).catch((err) => {
-        console.log("Автоойнату браузер саясатымен бұғатталды:", err);
-    });
+        
+        if (musicHint) {
+            musicHint.style.opacity = '0';
+            setTimeout(() => musicHint.style.display = 'none', 300);
+        }
+    } catch (err) {
+        console.log("Автоойнату браузер шектеуіне байланысты күтуде:", err);
+        isPlaying = false;
+    }
 }
 
+// Әуенді тоқтату
 function pauseAudio() {
     bgMusic.pause();
+    isPlaying = false;
     waveContainer.classList.remove('playing');
     musicIcon.className = "fa-solid fa-music text-lg";
-    isPlaying = false;
 }
 
-function toggleAudio() {
+// Батырманы басқанда қосу/өшіру
+musicToggle.addEventListener('click', (e) => {
+    e.stopPropagation(); // Деректер қақтығысын (event bubbling) тоқтату
     if (isPlaying) {
         pauseAudio();
     } else {
         playAudio();
     }
-}
-
-musicToggle.addEventListener('click', toggleAudio);
-
-// 1) Сайт толық жүктелгенде музыканы автоматты түрде қосу
-window.addEventListener('DOMContentLoaded', () => {
-    playAudio();
 });
 
-// 2) Браузер шектеу қойған жағдайда, пайдаланушы сайттың кез келген жерін алғаш рет басқанда музыка қосылады
-document.addEventListener('click', function startAudioOnInteraction() {
+// Экранды алғаш рет басқанда (click немесе touch) әуенді қосу
+function startAudioOnInteraction() {
     if (!isPlaying) {
         playAudio();
     }
+    // Экран саусақпен түртілсе де, тінтуірмен басылса да бір-ақ рет іске қосылады
     document.removeEventListener('click', startAudioOnInteraction);
-}, { once: true });
+    document.removeEventListener('touchstart', startAudioOnInteraction);
+}
 
+document.addEventListener('click', startAudioOnInteraction, { once: true });
+document.addEventListener('touchstart', startAudioOnInteraction, { once: true });
         // 4. ТАЙМЕР
         const weddingDate = new Date('October 25, 2026 18:00:00').getTime();
         function updateTimer() {
